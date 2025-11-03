@@ -1,12 +1,14 @@
 import 'package:equatable/equatable.dart';
+import 'package:floor/floor.dart';
 
 class ArticleEntity extends Equatable {
+  @PrimaryKey(autoGenerate: true)
   int? id;
   String? author;
   String? title;
   String? description;
   String? url;
-  String? urlTiImage;
+  String? urlToImage;
   String? publishedAt;
   String? content;
 
@@ -18,9 +20,9 @@ class ArticleEntity extends Equatable {
       this.description,
       this.publishedAt,
       this.url,
-      this.urlTiImage});
+      this.urlToImage});
 
   @override
   List<Object?> get props =>
-      [id, author, title, description, url, urlTiImage, publishedAt, content];
+      [id, author, title, description, url, urlToImage, publishedAt, content];
 }

@@ -20,7 +20,7 @@ class ArticleRepositoryImpl implements ArticleRepository {
       final httpResponse = await _newsAPiService.getNewsArticles(
           since: sinceQuery, count: countQuery);
       if (httpResponse.response.statusCode == HttpStatus.ok) {
-        return DataSuccess(httpResponse.data);
+        return DataSuccess(httpResponse.data.news);
       } else {
         return DataFailed(DioException(
             requestOptions: httpResponse.response.requestOptions,
