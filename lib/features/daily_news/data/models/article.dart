@@ -47,4 +47,15 @@ class ArticleModel extends ArticleEntity {
       'body': content,
     };
   }
+  factory ArticleModel.fromEntity(ArticleEntity entity) {
+    return ArticleModel(
+        id: entity.id,
+        author: entity.author,
+        title: entity.title,
+        description: entity.description,
+        url: entity.url,
+        urlToImage: entity.urlToImage,
+        publishedAt: entity.publishedAt,
+        content: entity.content);
+  }
 }

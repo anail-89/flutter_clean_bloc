@@ -42,27 +42,27 @@ class ArticleTile extends StatelessWidget {
   }
 
   Widget _buildImage(BuildContext context) {
-    // if (article.urlTiImage == null || article.urlTiImage!.isEmpty) {
-    //   return Container(
-    //     height: 200,
-    //     decoration: const BoxDecoration(
-    //       color: Colors.grey,
-    //       borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-    //     ),
-    //     child: const Center(
-    //       child: Icon(
-    //         Icons.image_not_supported,
-    //         size: 50,
-    //         color: Colors.white54,
-    //       ),
-    //     ),
-    //   );
-    // }
+    if (article.urlToImage == null || article.urlToImage!.isEmpty) {
+      return Container(
+        height: 200,
+        decoration: const BoxDecoration(
+          color: Colors.grey,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        ),
+        child: const Center(
+          child: Icon(
+            Icons.image_not_supported,
+            size: 50,
+            color: Colors.white54,
+          ),
+        ),
+      );
+    }
 
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       child: CachedNetworkImage(
-        imageUrl: article.urlTiImage!,
+        imageUrl: article.urlToImage!,
         height: 200,
         width: double.infinity,
         fit: BoxFit.cover,

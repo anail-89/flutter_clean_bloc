@@ -8,6 +8,7 @@ import 'config/theme/app_themes.dart';
 import 'features/daily_news/presentation/pages/home/daily_news.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await initializeDependencies();
   runApp(const MyApp());
 }
