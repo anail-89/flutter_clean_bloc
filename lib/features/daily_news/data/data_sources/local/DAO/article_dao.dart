@@ -3,7 +3,7 @@ import 'package:floor/floor.dart';
 
 @dao
 abstract class ArticleDao {
-  @Insert()
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertArticle(ArticleModel article);
 
   @delete

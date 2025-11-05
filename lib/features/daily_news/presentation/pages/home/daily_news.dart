@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_clean_bloc/features/daily_news/presentation/bloc/article/remote/remote_article_bloc.dart';
 import 'package:flutter_clean_bloc/features/daily_news/presentation/bloc/article/remote/remote_article_state.dart';
+import 'package:flutter_clean_bloc/features/daily_news/presentation/pages/article_detail/article_detail.dart';
 import 'package:flutter_clean_bloc/features/daily_news/presentation/widgets/article_tile.dart';
 
 class DailyNews extends StatelessWidget {
@@ -70,7 +71,12 @@ class DailyNews extends StatelessWidget {
             return ArticleTile(
               article: article,
               onArticlePressed: () {
-                // TODO: Navigate to article detail page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ArticleDetailPage(article: article),
+                  ),
+                );
               },
             );
           },
