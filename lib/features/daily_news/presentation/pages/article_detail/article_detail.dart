@@ -7,7 +7,7 @@ import 'package:flutter_clean_bloc/features/daily_news/presentation/bloc/article
 import 'package:flutter_clean_bloc/features/daily_news/presentation/bloc/article/local/local_article_state.dart';
 import 'package:intl/intl.dart';
 
-class ArticleDetailPage extends StatefulWidget {
+class ArticleDetailPage extends StatelessWidget {
   final ArticleEntity article;
 
   const ArticleDetailPage({
@@ -16,50 +16,31 @@ class ArticleDetailPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ArticleDetailPage> createState() => _ArticleDetailPageState();
-}
-
-class _ArticleDetailPageState extends State<ArticleDetailPage> {
-  bool _isSaved = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkIfSaved();
-  }
-
-  void _checkIfSaved() async {
-    // Get saved articles and check if current article is saved
-    context.read<LocalArticleBloc>().add(const GetSavedArticles());
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // Load saved articles when page opens
+    context.read<LocalArticleBloc>().add(const GetSavedArticles());
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Article Details'),
       ),
-      body: BlocConsumer<LocalArticleBloc, LocalArticlesState>(
-        listener: (context, state) {
-          if (state is LocalArticlesDone) {
-            // Check if current article is in saved list
-            setState(() {
-              _isSaved = state.articles?.any((article) =>
-                article.title == widget.article.title &&
-                article.url == widget.article.url
-              ) ?? false;
-            });
-          }
-        },
+      body: BlocBuilder<LocalArticleBloc, LocalArticlesState>(
         builder: (context, state) {
+          // Check if current article is saved by comparing with state
+          final bool isSaved = state is LocalArticlesDone
+              ? (state.articles?.any((savedArticle) =>
+                    savedArticle.title == article.title &&
+                    savedArticle.url == article.url) ??
+                  false)
+              : false;
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Article Image
-                if (widget.article.urlToImage != null)
+                if (article.urlToImage != null)
                   CachedNetworkImage(
-                    imageUrl: widget.article.urlToImage!,
+                    imageUrl: article.urlToImage!,
                     height: 250,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -80,7 +61,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                     children: [
                       // Title
                       Text(
-                        widget.article.title ?? 'No Title',
+                        article.title ?? 'No Title',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -91,12 +72,12 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                       // Author and Date
                       Row(
                         children: [
-                          if (widget.article.author != null) ...[
+                          if (article.author != null) ...[
                             const Icon(Icons.person, size: 16, color: Colors.grey),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                widget.article.author!,
+                                article.author!,
                                 style: const TextStyle(
                                   color: Colors.grey,
                                   fontSize: 14,
@@ -108,14 +89,14 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      if (widget.article.publishedAt != null) ...[
+                      if (article.publishedAt != null) ...[
                         Row(
                           children: [
                             const Icon(Icons.access_time, size: 16, color: Colors.grey),
                             const SizedBox(width: 4),
                             Text(
                               DateFormat('MMM dd, yyyy - HH:mm').format(
-                                DateTime.parse(widget.article.publishedAt!),
+                                DateTime.parse(article.publishedAt!),
                               ),
                               style: const TextStyle(
                                 color: Colors.grey,
@@ -128,9 +109,9 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                       const SizedBox(height: 20),
 
                       // Description
-                      if (widget.article.description != null) ...[
+                      if (article.description != null) ...[
                         Text(
-                          widget.article.description!,
+                          article.description!,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -141,7 +122,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                       ],
 
                       // Content
-                      if (widget.article.content != null) ...[
+                      if (article.content != null) ...[
                         const Text(
                           'Full Story',
                           style: TextStyle(
@@ -151,7 +132,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          widget.article.content!,
+                          article.content!,
                           style: const TextStyle(
                             fontSize: 16,
                             height: 1.6,
@@ -162,7 +143,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                       const SizedBox(height: 20),
 
                       // Source URL
-                      if (widget.article.url != null) ...[
+                      if (article.url != null) ...[
                         const Divider(),
                         const SizedBox(height: 12),
                         Row(
@@ -171,7 +152,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                widget.article.url!,
+                                article.url!,
                                 style: const TextStyle(
                                   color: Colors.blue,
                                   fontSize: 14,
@@ -191,24 +172,28 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                         children: [
                           Expanded(
                             child: ElevatedButton.icon(
-                              onPressed: _isSaved ? null : _saveArticle,
+                              onPressed: isSaved
+                                  ? null
+                                  : () => _saveArticle(context, article),
                               icon: const Icon(Icons.bookmark_add),
-                              label: Text(_isSaved ? 'Saved' : 'Save Article'),
+                              label: Text(isSaved ? 'Saved' : 'Save Article'),
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 14),
-                                backgroundColor: _isSaved ? Colors.grey : Colors.blue,
+                                backgroundColor: isSaved ? Colors.grey : Colors.blue,
                               ),
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton.icon(
-                              onPressed: _isSaved ? _removeArticle : null,
+                              onPressed: isSaved
+                                  ? () => _removeArticle(context, article)
+                                  : null,
                               icon: const Icon(Icons.bookmark_remove),
                               label: const Text('Remove'),
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 14),
-                                backgroundColor: _isSaved ? Colors.red : Colors.grey,
+                                backgroundColor: isSaved ? Colors.red : Colors.grey,
                               ),
                             ),
                           ),
@@ -225,15 +210,15 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
     );
   }
 
-  void _saveArticle() {
-    context.read<LocalArticleBloc>().add(SaveArticle(widget.article));
+  void _saveArticle(BuildContext context, ArticleEntity article) {
+    context.read<LocalArticleBloc>().add(SaveArticle(article));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Article saved to local storage')),
     );
   }
 
-  void _removeArticle() {
-    context.read<LocalArticleBloc>().add(RemoveArticle(widget.article));
+  void _removeArticle(BuildContext context, ArticleEntity article) {
+    context.read<LocalArticleBloc>().add(RemoveArticle(article));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Article removed from local storage')),
     );
